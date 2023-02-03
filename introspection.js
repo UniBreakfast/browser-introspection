@@ -11,7 +11,8 @@ const windowDescriptor = {
   }],
   primitive: false,
 }
-const registry = new Map([[window, windowDescriptor]])
+const nameRegistry = new Map
+const valueRegistry = new Map([[window, windowDescriptor]])
 
 let consoleWinPropNames = []
 
@@ -33,7 +34,8 @@ async function introspect() {
   const globallyAvailableValueNames = getGloballyAvailableValueNames()
   const consoleWinPropNames = getConsoleOnlyWinPropNames()
   const constructorWinPropNames = getConstructorWinPropNames()
-  const allVisitedValues = await getAllValues()
+  const allVisitedValues = await registerAllValues()
+  const allVisitedNames = registerAllNames()
 
   const functions = {
     getEnumWinPropNames,
@@ -43,7 +45,7 @@ async function introspect() {
     getGloballyAvailableValueNames,
     getConsoleOnlyWinPropNames,
     getConstructorWinPropNames,
-    getAllValues,
+    getAllValues: registerAllValues,
     subtract,
     isCapital, isUpperCase,
     isPrimitive,
@@ -58,24 +60,43 @@ async function introspect() {
     consoleWinPropNames,
     constructorWinPropNames,
     allVisitedValues,
+    allVisitedNames,
     functions,
   })
 
   console.log(introspection)
 }
 
-async function getAllValues(obj = window, name = 'window') {
+function registerAllNames() {
+  for (const [value, descriptor] of valueRegistry) {
+    const { foundIn } = descriptor
+
+    for (const { inProp } of foundIn) {
+      const valuePlace = { value, foundIn }
+      const valuesPlaces = nameRegistry.get(inProp)
+
+      if (!valuesPlaces) {
+        nameRegistry.set(inProp, [valuePlace])
+      } else if (!valuesPlaces.some(vp => vp.value === value && vp.foundIn === foundIn)) {
+        valuesPlaces.push(valuePlace)
+      }
+    }
+  }
+
+  return nameRegistry
+}
+
+async function registerAllValues(obj = window, name = 'window') {
   const keys = obj == window
     ? getWinPropNames()
     : Object.getOwnPropertyNames(obj)
-    
 
   for (const key of keys) {
     let value
 
     try { value = await obj[key] } catch (err) { value = err }
 
-    const descriptor = registry.get(value)
+    const descriptor = valueRegistry.get(value)
 
     if (!descriptor) {
       const primitive = isPrimitive(value)
@@ -84,7 +105,7 @@ async function getAllValues(obj = window, name = 'window') {
         inProp: key,
         ofObj: obj,
         visitedAs: name,
-        withDescriptor: registry.get(obj),
+        withDescriptor: valueRegistry.get(obj),
       }
 
       const descriptor = {
@@ -93,27 +114,27 @@ async function getAllValues(obj = window, name = 'window') {
         primitive,
       }
 
-      registry.set(value, descriptor)
+      valueRegistry.set(value, descriptor)
 
-      if (!primitive) getAllValues(value, key)
+      if (!primitive) registerAllValues(value, key)
     }
     else {
-      const known = descriptor.foundIn.some(({inProp, ofObj}) => inProp == key && ofObj == obj)
+      const known = descriptor.foundIn.some(({ inProp, ofObj }) => inProp == key && ofObj == obj)
 
       if (!known) {
         const place = {
           inProp: key,
           ofObj: obj,
           visitedAs: name,
-          withDescriptor: registry.get(obj),
+          withDescriptor: valueRegistry.get(obj),
         }
 
         descriptor.foundIn.push(place)
       }
     }
   }
-  
-  return registry
+
+  return valueRegistry
 }
 
 function isNotIntrospectionKey(key) {
