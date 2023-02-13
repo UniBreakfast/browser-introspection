@@ -1,3 +1,6 @@
+export { introspect }
+// import { PanWrapList } from './components/class-component/pan-wrap-list-pkg.js'
+
 const introspection = new class introspection { }
 const introspectionKeys = ['introspectionHubCore', 'introspectRightNow']
 
@@ -13,6 +16,7 @@ const windowDescriptor = {
 }
 const nameRegistry = new Map
 const valueRegistry = new Map([[window, windowDescriptor]])
+let wrapList
 
 let consoleWinPropNames = []
 
@@ -65,6 +69,10 @@ async function introspect() {
   })
 
   console.log(introspection)
+
+  wrapList = new PanWrapList(body)
+  wrapList.list(globallyAvailableValueNames)
+  wrapList.list([...allVisitedNames.keys()].sort((a, b) => a.localeCompare(b)))
 }
 
 function registerAllNames() {

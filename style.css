@@ -1,0 +1,8 @@
+horizontal-pan {
+  height: 100vh;
+  padding: 5px 10px;
+}
+
+wrap-list>li {
+  max-width: 300px;
+}

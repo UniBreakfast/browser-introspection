@@ -1,0 +1,57 @@
+:root {
+  --rainbow: conic-gradient(hsl(0, 95%, 60%),
+      hsl(30, 95%, 60%),
+      hsl(60, 95%, 60%),
+      hsl(90, 95%, 60%),
+      hsl(120, 95%, 60%),
+      hsl(150, 95%, 60%),
+      hsl(180, 95%, 60%),
+      hsl(210, 95%, 60%),
+      hsl(240, 95%, 60%),
+      hsl(270, 95%, 60%),
+      hsl(300, 95%, 60%),
+      hsl(330, 95%, 60%),
+      hsl(360, 95%, 60%));
+}
+
+horizontal-pan {
+  display: block;
+
+  height: 300px;
+
+  overflow: auto clip;
+}
+
+wide-element {
+  display: block;
+  background-image: var(--rainbow);
+
+  width: 2000px;
+  height: 100%;
+}
+
+wrap-list {
+  display: flex;
+  flex-flow: column wrap;
+  width: min-content;
+  height: 100%;
+
+  gap: 0 20px
+}
+
+wrap-list>li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  max-width: 250px;
+}
+
+/*
+::-webkit-scrollbar {
+  border: none;
+}
+::-webkit-scrollbar-thumb {
+  background: currentColor;
+}
+ */
