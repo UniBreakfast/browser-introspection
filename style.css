@@ -6,3 +6,9 @@ horizontal-pan {
 wrap-list>li {
   max-width: 300px;
 }
+
+drag-bar {
+  top: 0;
+  width: unset;
+  height: unset;
+}

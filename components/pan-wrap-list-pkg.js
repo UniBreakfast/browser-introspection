@@ -11,7 +11,8 @@ class PanWrapList {
 
     if (PanWrapList.rules) {
       const sheet = document.styleSheets[0]
-
+        || document.head.appendChild(document.createElement('style')).sheet
+        
       PanWrapList.rules.forEach(rule => sheet.insertRule(rule, sheet.cssRules.length))
       delete PanWrapList.rules
     }

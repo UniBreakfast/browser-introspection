@@ -12,15 +12,15 @@ class DragBar {
     parent.appendChild(bar).append(div)
 
     this.element = div
-    
+
     this.assignListeners()
-    
+
     DragBar.bars.push(bar)
-    
+
     if (DragBar.rules) {
       const sheet = document.styleSheets[0]
         || document.head.appendChild(document.createElement('style')).sheet
-        
+
       DragBar.rules.forEach(rule => sheet.insertRule(rule, sheet.cssRules.length))
       delete DragBar.rules
     }
@@ -42,6 +42,7 @@ class DragBar {
     if (e.target == this) {
       DragBar.e0 = e
       DragBar.current = this.parentElement.appendChild(this)
+      this.style.cursor = 'grabbing'
       window.addEventListener('mousemove', DragBar.handleDrag)
       window.addEventListener('mouseup', DragBar.handleMouseup)
     }
@@ -60,6 +61,7 @@ class DragBar {
   }
 
   static handleMouseup() {
+    DragBar.current.style.cursor = null
     window.removeEventListener('mousemove', DragBar.handleDrag)
     window.removeEventListener('mouseup', DragBar.handleMouseup)
   }
@@ -70,7 +72,7 @@ class DragBar {
       bar.style.top = normalize(bar.offsetTop, innerHeight - bar.offsetHeight) + 'px'
     }
   }
-  
+
   static rules = `
     drag-bar {
       position: fixed;
